@@ -16,12 +16,27 @@ DONE
 }
 
 DEVTOOLS=0
+PACKAGE="n"
+SIGN=0
 PLATFORM=""
-while getopts "p:t" opt; do
+while getopts "p:t:s:e:" opt; do
 	case $opt in
 		t)
 			DEVTOOLS=1
 			;;
+		e)
+			for i in `seq 0 1 $((${#OPTARG}-1))`
+			do
+				case ${OPTARG:i:1} in
+					y) SIGN="y";;
+					n) SIGN="n";;
+					*)
+						echo "$0: Invalid platform option ${OPTARG:i:1}"
+						usage
+						;;
+				esac
+			done
+			;;		
 		p)
 			for i in `seq 0 1 $((${#OPTARG}-1))`
 			do
@@ -29,6 +44,19 @@ while getopts "p:t" opt; do
 					m) PLATFORM="m";;
 					w) PLATFORM="w";;
 					l) PLATFORM="l";;
+					*)
+						echo "$0: Invalid platform option ${OPTARG:i:1}"
+						usage
+						;;
+				esac
+			done
+			;;		
+		s) 
+			for i in `seq 0 1 $((${#OPTARG}-1))`
+			do
+				case ${OPTARG:i:1} in
+					y) PACKAGE="y";;
+					n) PACKAGE="n";;
 					*)
 						echo "$0: Invalid platform option ${OPTARG:i:1}"
 						usage
@@ -58,7 +86,7 @@ CHANNEL="source"
 VERSION=`perl -ne 'print and last if s/.*<em:version>(.{3}).+/\1/;' "$ZOTERO_SOURCE_DIR/install.rdf"`
 if [ $VERSION = "4.0" ]; then
 	"$ZOTERO_BUILD_DIR/xpi/build_xpi_4.0" "$ZOTERO_SOURCE_DIR" $CHANNEL
-	"$ROOT_DIR/build.sh" -f "$ZOTERO_BUILD_DIR/xpi/build/zotero-build.xpi" -p $PLATFORM -c $CHANNEL -s
+	"$ROOT_DIR/build.sh" -f "$ZOTERO_BUILD_DIR/xpi/build/zotero-build.xpi" -p $PLATFORM -c $CHANNEL -s $PACKAGE -e $SIGN
 else
 	PARAMS=""
 	if [ $DEVTOOLS -eq 1 ]; then
@@ -68,5 +96,5 @@ else
 	hash=`git -C "$ZOTERO_SOURCE_DIR" rev-parse --short HEAD`
 	
 	"$ZOTERO_BUILD_DIR/xpi/build_xpi" -s "$ZOTERO_SOURCE_DIR/build" -c $CHANNEL -m $hash
-	"$ROOT_DIR/build.sh" -d "$ZOTERO_BUILD_DIR/xpi/build/staging" -p $PLATFORM -c $CHANNEL -s $PARAMS
+	"$ROOT_DIR/build.sh" -d "$ZOTERO_BUILD_DIR/xpi/build/staging" -p $PLATFORM -c $CHANNEL -s $PACKAGE -e $SIGN $PARAMS
 fi

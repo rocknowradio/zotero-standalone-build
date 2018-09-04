@@ -41,7 +41,7 @@ Options
  -t                  add devtools
  -p PLATFORMS        build for platforms PLATFORMS (m=Mac, w=Windows, l=Linux)
  -c CHANNEL          use update channel CHANNEL
- -e                  enforce signing
+ -e SIGN             enforce signing
  -s                  don't package; only build binaries in staging/ directory
 DONE
 	exit 1
@@ -63,8 +63,9 @@ BUILD_MAC=0
 BUILD_WIN32=0
 BUILD_LINUX=0
 PACKAGE=1
+SIGN=0
 DEVTOOLS=0
-while getopts "d:f:p:c:tse" opt; do
+while getopts "d:f:p:c:ts:e:" opt; do
 	case $opt in
 		d)
 			SOURCE_DIR="$OPTARG"
@@ -93,10 +94,30 @@ while getopts "d:f:p:c:tse" opt; do
 			DEVTOOLS=1
 			;;
 		e)
-			SIGN=1
+			for i in `seq 0 1 $((${#OPTARG}-1))`
+			do
+				case ${OPTARG:i:1} in
+					y) SIGN=1;;
+					n) SIGN=0;;
+					*)
+						echo "$0: Invalid sign option ${OPTARG:i:1}"
+						SIGN=0
+						;;
+				esac
+			done
 			;;
 		s)
-			PACKAGE=0
+			for i in `seq 0 1 $((${#OPTARG}-1))`
+			do
+				case ${OPTARG:i:1} in
+					y) PACKAGE=1;;
+					n) PACKAGE=0;;
+					*)
+						echo "$0: Invalid platform option ${OPTARG:i:1}"
+						usage
+						;;
+				esac
+			done
 			;;
 		*)
 			usage
