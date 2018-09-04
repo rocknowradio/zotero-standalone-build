@@ -24,11 +24,23 @@ KEYCHAIN=""
 KEYCHAIN_PASSWORD=""
 
 # Paths for Windows installer build
-NSIS_DIR='C:\Program Files (x86)\NSIS\Unicode\'
+if [ ! -n "${NSIS_DIR+set}" ]
+then
+  NSIS_DIR='C:\Program Files (x86)\NSIS\Unicode\'
+  echo "NSIS_DIR not found, defining as: $NSIS_DIR"
+else  
+  echo "NSIS_DIR already defined: $NSIS_DIR"
+fi  
+NSIS_TOOL="${NSIS_DIR}/makensis.exe"
 
 # Paths for Windows installer build only necessary for signed binaries
-#SIGNTOOL='C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Bin\signtool.exe'
-SIGNTOOL='C:\Program Files (x86)\Windows Kits\8.0\bin\x86\signtool.exe'
+if [ ! -n "${SIGNTOOL+set}" ]
+then
+  SIGNTOOL='C:\Program Files (x86)\Windows Kits\8.0\bin\x86\signtool.exe'
+  echo "SIGNTOOL not found, defining as: $SIGNTOOL"
+else
+  echo "SIGNTOOL already defined: $SIGNTOOL"
+fi
 SIGNATURE_URL='https://www.zotero.org/'
 SIGNTOOL_CERT_SUBJECT="Corporation for Digital Scholarship"
 
